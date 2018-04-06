@@ -95,6 +95,12 @@ static inline void usbcdc_discard_rxb(uint8_t intfNum){
     USBCDC_rejectData(intfNum);
 }
 
+
+//TODO Implement this
+static inline uint8_t usbcdc_txready(uint8_t intfNum){
+    return 0;
+}
+
 #endif
 
 #endif
