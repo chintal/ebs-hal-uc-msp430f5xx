@@ -32,6 +32,7 @@
 #define HAL_UC_USBCDC_H
 
 #include <stdarg.h>
+#include <platform/transport.h>
 #include "types.h"
 #include "map.h"
 
@@ -164,7 +165,7 @@ static inline uint8_t usbcdc_putc(uint8_t intfnum, uint8_t byte,
  * @see usbcdc_send_trigger()
  * @see usbcdc_send_flush()
  */
-static inline uint8_t usbcdc_write(uint8_t intfnum, void *buffer, uint8_t len, 
+static inline uint8_t usbcdc_write(uint8_t intfnum, uint8_t *buffer, uint8_t len, 
                                    uint8_t token);
 
 /**
@@ -181,7 +182,7 @@ static inline uint8_t usbcdc_txready(uint8_t intfNum);
 
 static inline uint8_t usbcdc_getc(uint8_t intfnum);
 
-static inline uint8_t usbcdc_read(uint8_t intfnum, void *buffer, uint8_t len);
+static inline uint8_t usbcdc_read(uint8_t intfnum, uint8_t *buffer, uint8_t len);
 
 /**
  * \brief Get number of unhandled bytes of a specific USB CDC RX interface.
@@ -197,6 +198,9 @@ static inline uint8_t usbcdc_population_rxb(uint8_t intfNum);
 static inline void usbcdc_discard_rxb(uint8_t intfNum);
 
 /**@}*/
+
+extern const pluggable_transport_t ptransport_usbcdc;
+
 #endif 
 #endif
 

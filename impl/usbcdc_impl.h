@@ -72,9 +72,9 @@ static inline uint8_t usbcdc_putc(uint8_t intfnum, uint8_t byte, uint8_t token, 
     return stat;
 }
 
-static inline uint8_t usbcdc_write(uint8_t intfnum, void *buffer, uint8_t len, uint8_t token){
+static inline uint8_t usbcdc_write(uint8_t intfnum, uint8_t *buffer, uint8_t len, uint8_t token){
     uint8_t rval;
-    rval = USBCDC_sendBuffer(intfnum, (uint8_t *) buffer, len);
+    rval = USBCDC_sendBuffer(intfnum, buffer, len);
     usbcdc_send_trigger(intfnum);
     return rval;
 }
@@ -83,8 +83,8 @@ static inline uint8_t usbcdc_getc(uint8_t intfnum){
     return USBCDC_recieveChar(intfnum);
 }
 
-static inline uint8_t usbcdc_read(uint8_t intfnum, void *buffer, uint8_t len){
-    return USBCDC_recieveBuffer(intfnum, (uint8_t *) buffer, len);
+static inline uint8_t usbcdc_read(uint8_t intfnum, uint8_t *buffer, uint8_t len){
+    return USBCDC_recieveBuffer(intfnum, buffer, len);
 }
 
 static inline uint8_t usbcdc_population_rxb(uint8_t intfNum){

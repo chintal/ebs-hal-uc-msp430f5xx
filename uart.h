@@ -34,6 +34,7 @@
 #define HAL_UC_UART_H
 
 #include <stdarg.h>
+#include <platform/transport.h>
 #include "types.h"
 #include "map.h"
 
@@ -105,7 +106,7 @@ static inline uint8_t uart_reqlock(uint8_t intfnum, uint8_t len, uint8_t token);
  */
 static inline uint8_t uart_putc(uint8_t intfnum, uint8_t byte, uint8_t token, uint8_t handlelock);
 
-static inline uint8_t uart_write(uint8_t intfnum, void *buffer, uint8_t len, uint8_t token);
+static inline uint8_t uart_write(uint8_t intfnum, uint8_t *buffer, uint8_t len, uint8_t token);
 
 /**
  * @brief TX buffer prep function - printf
@@ -150,7 +151,7 @@ static inline void uart_discard_rxb(uint8_t intfnum);
 
 static inline uint8_t uart_getc(uint8_t intfnum);
 
-static inline uint8_t uart_read(uint8_t intfnum, void *buffer, uint8_t len);
+static inline uint8_t uart_read(uint8_t intfnum, uint8_t *buffer, uint8_t len);
 
 void _uart0_irqhandler(void);
 void _uart1_irqhandler(void);
@@ -198,6 +199,8 @@ static inline void uart_putc_bare(uint8_t intfnum, uint8_t byte);
  */
 static inline uint8_t uart_getc_bare(uint8_t intfnum);
 /**@}*/ 
+
+extern const pluggable_transport_t ptransport_uart;
 
 #endif
 

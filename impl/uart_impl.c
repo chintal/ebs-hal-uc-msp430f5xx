@@ -231,4 +231,35 @@ uint8_t uart_vprintf(uint8_t intfnum, const char *format, va_list * args){
             return 0;
         }
 }
+
+static uint8_t _uart_population_rxb(uint8_t intfnum){
+    return uart_population_rxb(intfnum);
+}
+
+static uint8_t _uart_read(uint8_t intfnum, uint8_t * buffer, uint8_t len){
+    return uart_read(intfnum, buffer, len);
+}
+
+static uint8_t _uart_reqlock(uint8_t intfnum, uint8_t len, uint8_t token){
+    return uart_reqlock(intfnum, len, token);
+}
+
+static uint8_t _uart_rellock(uint8_t intfnum, uint8_t token){
+    return uart_rellock(intfnum, token);
+}
+
+static uint8_t _uart_write(uint8_t intfnum, uint8_t * buffer, uint8_t len, uint8_t token){
+    return uart_write(intfnum, buffer, len, token);
+}
+
+const pluggable_transport_t ptransport_uart = {
+    &uart_init,
+    &_uart_population_rxb,
+    &_uart_read,
+    &_uart_reqlock,
+    &_uart_rellock,
+    &_uart_write,
+    &uart_send_trigger
+};
+
 #endif

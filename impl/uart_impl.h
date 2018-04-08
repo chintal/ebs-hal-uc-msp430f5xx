@@ -83,9 +83,9 @@ static inline uint8_t uart_putc(uint8_t intfnum, uint8_t byte, uint8_t token, ui
     return 0;
 }
 
-static inline uint8_t uart_write(uint8_t intfnum, void* buffer, uint8_t len, uint8_t token){
+static inline uint8_t uart_write(uint8_t intfnum, uint8_t * buffer, uint8_t len, uint8_t token){
     uint8_t rval;
-    rval = bytebuf_cPushLen(uart_if[intfnum]->txbuf, buffer, len, token);
+    rval = bytebuf_cPushLen(uart_if[intfnum]->txbuf, (void *)buffer, len, token);
     uart_send_trigger(intfnum);
     return rval;
 }
@@ -94,8 +94,8 @@ static inline uint8_t uart_getc(uint8_t intfnum){
     return bytebuf_cPopByte(uart_if[intfnum]->rxbuf);
 }
 
-static inline uint8_t uart_read(uint8_t intfnum, void* buffer, uint8_t len){
-    return bytebuf_cPopLen(uart_if[intfnum]->rxbuf, buffer, len);
+static inline uint8_t uart_read(uint8_t intfnum, uint8_t * buffer, uint8_t len){
+    return bytebuf_cPopLen(uart_if[intfnum]->rxbuf, (void *)buffer, len);
 }
     
 static inline uint8_t uart_population_rxb(uint8_t intfnum){
