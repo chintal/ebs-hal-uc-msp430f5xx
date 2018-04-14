@@ -28,6 +28,6 @@
 #ifndef HAL_UC_TYPES_H
 #define HAL_UC_TYPES_H
 
-#include "impl/uc_types_impl.h"
+#include <platform/types.h>
 
 #endif
