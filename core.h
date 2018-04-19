@@ -33,19 +33,6 @@
 #include "map.h"
 
 /**
- * @name Core API Functions
- * Various functions to control the uC core and execution. Implementation is 
- * left to the implementation layer at `core_impl.h`.
- */
-/**@{*/ 
-/** Global Interrupt Enable.*/
-static inline void global_interrupt_enable(void);
-
-/** Global Interrupt Disable.*/
-static inline void global_interrupt_disable(void);
-/**@}*/ 
-
-/**
  * @name Watchdog API Functions
  * Various functions to control the primary watchdog. Implementation is 
  * left to the implementation layer at `core_impl.h`.

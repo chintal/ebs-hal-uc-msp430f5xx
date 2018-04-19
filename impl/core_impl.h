@@ -27,15 +27,6 @@
 
 #include "msp430-driverlib/MSP430F5xx_6xx/driverlib.h"
 
-static inline void global_interrupt_enable(void){
-    __enable_interrupt();
-}
-
-static inline void global_interrupt_disable(void){
-    __disable_interrupt();
-}
-
-
 #define _uC_MCLK_DIV         (uC_FLL_FRQ_HZ / uC_MCLK_FRQ_HZ)
 
 #if _uC_MCLK_DIV == 1
