@@ -26,7 +26,7 @@
 
 #include <string.h>
 #include <printf/printf.h>
-#include <bytebuf/bytebuf.h>
+#include <ds/bytebuf.h>
 
 #include "msp430-driverlib/MSP430F5xx_6xx/driverlib.h"
 
