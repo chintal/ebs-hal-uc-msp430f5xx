@@ -77,11 +77,11 @@ static inline void timer_disable_int_top(uint8_t intfnum);
 // Set TOP for the timer.
 static inline void timer_set_top(uint8_t intfnum, uint16_t top);
 
-// Enable output from the timer channel.
-static inline void timer_enable_out_ch( uint8_t intfnum, uint8_t channel);
+// Get TOP for the timer.
+static inline uint16_t timer_get_top(uint8_t intfnum);
 
-// Disable output from the timer channel.
-static inline void timer_disable_out_ch( uint8_t intfnum, uint8_t channel);
+// Set output mode for the timer channel.
+static inline void timer_set_outmode_ch( uint8_t intfnum, uint8_t channel, uint8_t outmode);
 
 // Enable the compare match interrupt for the timer channel.
 static inline void timer_enable_int_ch ( uint8_t intfnum, uint8_t channel);
@@ -91,6 +91,9 @@ static inline void timer_disable_int_ch( uint8_t intfnum, uint8_t channel);
 
 // Set the channel compare match value.
 static inline void timer_set_cmr_ch(uint8_t intfnum, uint8_t channel, uint16_t cm);
+
+// Get the channel compare match value.
+static inline uint16_t timer_get_cmr_ch(uint8_t intfnum, uint8_t channel);
 
 #endif
 

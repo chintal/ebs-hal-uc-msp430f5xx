@@ -37,7 +37,7 @@ typedef enum {
     TIMER_MODE_STOPPED, 
     TIMER_MODE_PERIODIC, 
     TIMER_MODE_COUNTING, 
-    TIMER_MODE_PWM
+    TIMER_MODE_UPDOWN,
 } TIMER_MODE;
 
 typedef enum {
@@ -62,6 +62,15 @@ typedef enum {
     TIMER_PRESCALER_DIV56, 
     TIMER_PRESCALER_DIV64,
 } TIMER_PRESCALER;
+
+typedef enum {
+    TIMER_OUTMODE_PWM,      // Reset/Set
+    TIMER_OUTMODE_NPWM,     // Set/Reset
+    TIMER_OUTMODE_SET,      // Set,    NotImplemented
+    TIMER_OUTMODE_RESET,    // Reset,  NotImplemented
+    TIMER_OUTMODE_TOGGLE,   // Toggle, NotImplemented
+    TIMER_OUTMODE_BIT,      // Bit,    NotImplemented
+} TIMER_OUTMODE;
 
 
 typedef struct _TIMER_HWIF_t{
@@ -227,7 +236,7 @@ static inline void timer_set_mode(uint8_t intfnum, uint8_t mode){
         case TIMER_MODE_COUNTING:
             lmode = MC__CONTINUOUS;
             break;
-        case TIMER_MODE_PWM:
+        case TIMER_MODE_UPDOWN:
             lmode = MC__UPDOWN;
             break;
         default:
@@ -246,7 +255,21 @@ static inline void timer_disable_int_overflow(uint8_t intfnum){
 };
 
 static inline void timer_set_top(uint8_t intfnum, uint16_t top){
-    timer_set_cmr_ch(intfnum, 0, top);
+    if (timer_if[intfnum]->state->mode == TIMER_MODE_COUNTING){
+        return;
+    }
+    else{
+        timer_set_cmr_ch(intfnum, 0, top);
+    }
+}
+
+static inline uint16_t timer_get_top(uint8_t intfnum){
+    if (timer_if[intfnum]->state->mode == TIMER_MODE_COUNTING){
+        return (0xFFFF);
+    }
+    else{
+        return (timer_get_cmr_ch(intfnum, 0));
+    }
 }
 
 static inline void timer_enable_int_top(uint8_t intfnum){
@@ -263,20 +286,29 @@ static inline uint16_t timer_chctl_offset(uint8_t channel){
     return (0x02 + 2 * channel);
 }
 
-static inline void timer_enable_int_ch ( uint8_t intfnum, uint8_t channel){
+static inline void timer_enable_int_ch (uint8_t intfnum, uint8_t channel){
     HWREG16(timer_if[intfnum]->hwif->base + timer_chctl_offset(channel)) |= CCIE;
 }
 
-static inline void timer_disable_int_ch( uint8_t intfnum, uint8_t channel){
+static inline void timer_disable_int_ch(uint8_t intfnum, uint8_t channel){
     HWREG16(timer_if[intfnum]->hwif->base + timer_chctl_offset(channel)) &= ~CCIE;
 }
 
-static inline void timer_enable_out_ch ( uint8_t intfnum, uint8_t channel){
-    ;
-}
-
-static inline void timer_disable_out_ch( uint8_t intfnum, uint8_t channel){
-    ;
+static inline void timer_set_outmode_ch(uint8_t intfnum, uint8_t channel, uint8_t outmode){
+    uint16_t loutmode;
+    switch (outmode){
+        case TIMER_OUTMODE_PWM:
+            loutmode = OUTMOD_7;
+            break;
+        case TIMER_OUTMODE_NPWM:
+            loutmode = OUTMOD_3;
+            break;
+        default:
+            loutmode = OUTMOD_0;
+            break;
+    }
+    HWREG16(timer_if[intfnum]->hwif->base + timer_chctl_offset(channel)) &= ~(OUTMOD0 | OUTMOD1 | OUTMOD2);
+    HWREG16(timer_if[intfnum]->hwif->base + timer_chctl_offset(channel)) |= (loutmode | OUT);
 }
 
 static inline uint16_t timer_chccr_offset(uint8_t channel);
@@ -288,7 +320,14 @@ static inline uint16_t timer_chccr_offset(uint8_t channel){
 static inline void timer_set_cmr_ch(uint8_t intfnum, uint8_t channel, uint16_t cm){
     HWREG16(timer_if[intfnum]->hwif->base + timer_chccr_offset(channel)) = cm;
 }
-    
+
+static inline uint16_t timer_get_cmr_ch(uint8_t intfnum, uint8_t channel){
+//     if (timer_if[intfnum]->state->mode != TIMER_MODE_COUNTING && channel==0){
+//         return *(uint16_t *)(timer_if[intfnum]->hwif->base + timer_chccr_offset(channel));
+//     }
+    return HWREG16(timer_if[intfnum]->hwif->base + timer_chccr_offset(channel));
+}
+
 #endif
 
 #endif
