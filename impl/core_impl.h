@@ -73,10 +73,6 @@ static inline void watchdog_start(void){
     WDT_A_start(WDT_A_BASE);
 }
 
-static inline void watchdog_clear(void){
-    WDT_A_resetTimer(WDT_A_BASE);
-}
-
 #else
 #error WDT Provider not recognized
 #endif

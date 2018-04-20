@@ -45,7 +45,7 @@ static inline void watchdog_hold(void);
 static inline void watchdog_start(void);
 
 /** Clear the watchdog timer.*/
-static inline void watchdog_clear(void);
+void watchdog_clear(void);
 
 /** 
  * Initialize the watchdog timer to some default interval.

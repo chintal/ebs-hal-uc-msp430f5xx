@@ -34,9 +34,15 @@
 */
 void watchdog_init(void) {
     WDT_A_initWatchdogTimer(WDT_A_BASE,
-                            WDT_A_CLOCKSOURCE_SMCLK, 
-                            WDT_A_CLOCKDIVIDER_32K);
+                            WDT_A_CLOCKSOURCE_SMCLK,
+                            WDT_A_CLOCKDIVIDER_128M);
+    watchdog_start();
 }
+
+void watchdog_clear(void){
+    WDT_A_resetTimer(WDT_A_BASE);
+}
+
 #endif
 #endif
 
