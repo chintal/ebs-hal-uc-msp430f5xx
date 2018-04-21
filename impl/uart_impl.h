@@ -35,9 +35,9 @@
 typedef enum {UART_HWIF_USCI_A} UART_HWIF_TYPE;
 
 typedef struct _UART_HWIF_t{
-    UART_HWIF_TYPE type;
-    HAL_ADDRESS_t base;
-    HAL_BASE_t vector;
+    const UART_HWIF_TYPE type;
+    const uint16_t base;
+    const uint8_t vector;
 }_uart_hwif_t;
 
 typedef struct _UART_STATE_t{
@@ -46,8 +46,8 @@ typedef struct _UART_STATE_t{
 }uart_state_t;
 
 typedef struct UART_IF_t{
-    const _uart_hwif_t * hwif;
-    uart_state_t * state;
+    const _uart_hwif_t * const hwif;
+    uart_state_t * const state;
     bytebuf * const txbuf;
     bytebuf * const rxbuf;
 }uart_if_t;
