@@ -55,7 +55,7 @@
 #define HAL_UC_USB_H
 
 #include <stdarg.h>
-#include "types.h"
+#include <platform/types.h>
 #include "map.h"
 
 #ifdef uC_INCLUDE_USB_IFACE

@@ -21,7 +21,7 @@
 
 #include "../core.h"
 
-#include "msp430-driverlib/MSP430F5xx_6xx/driverlib.h"
+#include <msp430-driverlib/MSP430F5xx_6xx/driverlib.h>
 
 #if uC_HAS_WDT == 1
 #if uC_WDT_PROVIDER == MSP_WDT_A 

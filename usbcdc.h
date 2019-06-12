@@ -33,7 +33,7 @@
 
 #include <stdarg.h>
 #include <platform/transport.h>
-#include "types.h"
+#include <platform/types.h>
 #include "map.h"
 
 #ifdef uC_INCLUDE_USB_IFACE

@@ -29,7 +29,7 @@
 #ifndef HAL_UC_GPIO_H
 #define HAL_UC_GPIO_H
 
-#include "types.h"
+#include <platform/types.h>
 #include "map.h"
 
 /**

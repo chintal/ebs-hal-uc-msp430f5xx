@@ -35,7 +35,7 @@
 
 #include <stdarg.h>
 #include <platform/transport.h>
-#include "types.h"
+#include <platform/types.h>
 #include "map.h"
 
 #ifdef uC_INCLUDE_UART_IFACE
@@ -175,7 +175,7 @@ extern uint16_t * uart1_overrun_counter;
  * 
  * @warning In a general application, this function would only be used 
  * in special circumstances and with extreme care. Using this alongside 
- * bytebufs will cause dataloss. If you intend to use this interface, 
+ * bytebufs will cause data loss. If you intend to use this interface, 
  * the peripheral initialization may need to be changed to not enable 
  * interrupts.
  */
@@ -191,7 +191,7 @@ static inline void uart_putc_bare(uint8_t intfnum, uint8_t byte);
  * 
  * @warning In a general application, this function would only be used 
  * in special circumstances and with extreme care. Using this alongside 
- * bytebufs will cause dataloss. If you intend to use this interface, 
+ * bytebufs will cause data loss. If you intend to use this interface, 
  * the peripheral initialization may need to be changed to not enable 
  * interrupts.
  * 

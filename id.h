@@ -31,7 +31,7 @@
 #ifndef HAL_UC_ID_H
 #define HAL_UC_ID_H
 
-#include "types.h"
+#include <platform/types.h>
 #include "map.h"
 
 /**
