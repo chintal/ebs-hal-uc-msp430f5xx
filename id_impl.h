@@ -23,7 +23,7 @@
 #define ID_IMPL_H
 
 #include "app/application.h"
-#include "../id.h"
+#include "hal/uc/id.h"
 
 #include "msp430-driverlib/MSP430F5xx_6xx/driverlib.h"
 

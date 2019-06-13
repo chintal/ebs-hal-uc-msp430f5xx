@@ -20,7 +20,7 @@
 */
 
 
-#include "../uart.h"
+#include "hal/uc/uart.h"
 
 #include "msp430-driverlib/MSP430F5xx_6xx/usci_a_uart.h"
 

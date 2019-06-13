@@ -20,7 +20,7 @@
 */
 
 
-#include "../timer.h"
+#include "hal/uc/timer.h"
 #include <stddef.h>
 
 #include "msp430-driverlib/MSP430F5xx_6xx/timer_a.h"

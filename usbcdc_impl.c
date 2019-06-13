@@ -20,7 +20,7 @@
  */
 
 
-#include "../usbcdc.h"
+#include "hal/uc/usbcdc.h"
 
 #ifdef uC_INCLUDE_USB_IFACE
 #if uC_USBCDC_ENABLED

@@ -22,7 +22,7 @@
 #ifndef USBCDC_IMPL_H
 #define USBCDC_IMPL_H
 
-#include "../map.h"
+#include "hal/uc/map.h"
 #include <stddef.h>
 
 #ifdef uC_INCLUDE_USB_IFACE

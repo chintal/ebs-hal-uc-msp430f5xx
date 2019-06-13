@@ -22,7 +22,7 @@
 #ifndef TIMER_IMPL_H
 #define TIMER_IMPL_H
 
-#include "../timer.h"
+#include "hal/uc/timer.h"
 #include "msp430-driverlib/MSP430F5xx_6xx/driverlib.h"
 
 #ifdef uC_INCLUDE_TIMER_IFACE

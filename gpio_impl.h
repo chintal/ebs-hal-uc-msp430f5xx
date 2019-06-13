@@ -22,6 +22,7 @@
 #ifndef GPIO_IMPL_H
 #define GPIO_IMPL_H
 
+#include <platform/types.h>
 #include "msp430-driverlib/MSP430F5xx_6xx/driverlib.h"
 
 /* This implementation can be made significantly faster by eliminating 

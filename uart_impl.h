@@ -22,7 +22,7 @@
 #ifndef UART_IMPL_H
 #define UART_IMPL_H
 
-#include "../uart.h"
+#include "hal/uc/uart.h"
 
 #include <string.h>
 #include <printf/printf.h>

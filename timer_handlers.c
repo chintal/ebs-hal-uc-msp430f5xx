@@ -1,8 +1,9 @@
-/*  
-   Copyright 2016 Chintalagiri Shashank, Quazar Technologies Pvt. Ltd.
-    
+/* 
+   Copyright (c)
+    (c) 2016 Chintalagiri Shashank, Quazar Technologies Pvt. Ltd.
+      
    This file is part of
-   Embedded bootstraps : hal-uC
+   Embedded bootstraps : Peripheral driver implementations : MSP430
    
    This library is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published
@@ -18,16 +19,18 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-/**
- * @file hal_uc_map.h
- * @brief HAL for uC Peripheral Map
- *
- * 
- */
+#include "app/application.h"
+#include "app/application_handlers.h"
+#include "hal/uc/timer.h"
 
-#ifndef HAL_UC_MAP_H
-#define HAL_UC_MAP_H
 
-#include "impl/uc_map_impl.h"
+volatile uint8_t __timer_handler_inclusion;
 
+#if uC_TIMER1_ENABLED
+__attribute__((interrupt(uC_TIMER1_PRIMARY_VECTOR)))
+void _timer1_primary_irqhandler(void){
+    uC_TIMER1_TOP_IRQ_HANDLER();
+}
 #endif
+
+

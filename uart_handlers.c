@@ -20,7 +20,7 @@
 */
 
 #include <ds/bytebuf.h>
-#include "../uart.h"
+#include "hal/uc/uart.h"
 
 
 volatile uint8_t __uart_handler_inclusion;

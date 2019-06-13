@@ -20,8 +20,8 @@
 */
 
 
-#include "../entropy.h"
-#include "../timer.h"
+#include "hal/uc/entropy.h"
+#include "hal/uc/timer.h"
 #include "app/application.h"
 #include <msp430-driverlib/MSP430F5xx_6xx/driverlib.h>
 #include <stdlib.h>
