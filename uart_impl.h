@@ -143,5 +143,7 @@ static inline uint8_t uart_getc_bare(uint8_t intfnum){
         return USCI_A_UART_receiveData(uart_if[intfnum]->hwif->base);
     }
 }    
+
 #endif
+
 #endif
