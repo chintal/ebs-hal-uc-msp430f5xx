@@ -141,6 +141,120 @@
 
 
 /**
+ * @name SPI Configuration
+ */
+/**@{*/ 
+
+    #define uC_AVAILABLE_SPIS     4
+
+    /**
+    * @name SPI 0 Configuration (UCA0)
+    */
+    /**@{*/
+    #define uC_HAS_SPI0             1
+    #ifndef uC_SPI0_TXBUF_LEN
+        #define uC_SPI0_TXBUF_LEN     10
+    #endif
+    #ifndef uC_SPI0_RXBUF_LEN
+        #define uC_SPI0_RXBUF_LEN     10
+    #endif
+    
+    #define uC_SPI0_TYPE            SPI_HWIF_USCI_A
+    #define uC_SPI0_BASE            USCI_A0_BASE
+    #define uC_SPI0_VECTOR          USCI_A0_VECTOR
+
+    #define uC_PORTSEL_SPI0_MISO    GPIO_PORT_P3
+    #define uC_PINSEL_SPI0_MISO     GPIO_PIN4
+    
+    #define uC_PORTSEL_SPI0_MOSI    GPIO_PORT_P3
+    #define uC_PINSEL_SPI0_MOSI     GPIO_PIN3
+    
+    #define uC_PORTSEL_SPI0_SCLK    GPIO_PORT_P2
+    #define uC_PINSEL_SPI0_SCLK     GPIO_PIN7
+    /**@}*/ 
+    
+    /**
+    * @name SPI 1 Configuration (UCB0)
+    */
+    /**@{*/ 
+    #define uC_HAS_SPI1             1
+    #ifndef uC_SPI1_TXBUF_LEN
+        #define uC_SPI1_TXBUF_LEN     10
+    #endif
+    #ifndef uC_SPI1_RXBUF_LEN
+        #define uC_SPI1_RXBUF_LEN     10
+    #endif
+    
+    #define uC_SPI1_TYPE            SPI_HWIF_USCI_B
+    #define uC_SPI1_BASE            USCI_B0_BASE
+    #define uC_SPI1_VECTOR          USCI_B0_VECTOR
+
+    #define uC_PORTSEL_SPI1_MISO    GPIO_PORT_P3
+    #define uC_PINSEL_SPI1_MISO     GPIO_PIN1
+    
+    #define uC_PORTSEL_SPI1_MOSI    GPIO_PORT_P3
+    #define uC_PINSEL_SPI1_MOSI     GPIO_PIN0
+    
+    #define uC_PORTSEL_SPI1_SCLK    GPIO_PORT_P3
+    #define uC_PINSEL_SPI1_SCLK     GPIO_PIN2
+    /**@}*/ 
+    
+    /**
+    * @name SPI 2 Configuration (UCA1)
+    */
+    /**@{*/ 
+    #define uC_HAS_SPI2             1
+    #ifndef uC_SPI2_TXBUF_LEN
+        #define uC_SPI2_TXBUF_LEN     10
+    #endif
+    #ifndef uC_SPI2_RXBUF_LEN
+        #define uC_SPI2_RXBUF_LEN     10
+    #endif
+    
+    #define uC_SPI2_TYPE            SPI_HWIF_USCI_A
+    #define uC_SPI2_BASE            USCI_A1_BASE
+    #define uC_SPI2_VECTOR          USCI_A1_VECTOR
+
+    #define uC_PORTSEL_SPI2_MISO    GPIO_PORT_P4
+    #define uC_PINSEL_SPI2_MISO     GPIO_PIN5
+    
+    #define uC_PORTSEL_SPI2_MOSI    GPIO_PORT_P4
+    #define uC_PINSEL_SPI2_MOSI     GPIO_PIN4
+    
+    #define uC_PORTSEL_SPI2_SCLK    GPIO_PORT_P4
+    #define uC_PINSEL_SPI2_SCLK     GPIO_PIN0
+    /**@}*/ 
+    
+    /**
+    * @name SPI 3 Configuration (UCB1)
+    */
+    /**@{*/ 
+    #define uC_HAS_SPI3             1
+    #ifndef uC_SPI3_TXBUF_LEN
+        #define uC_SPI3_TXBUF_LEN     10
+    #endif
+    #ifndef uC_SPI3_RXBUF_LEN
+        #define uC_SPI3_RXBUF_LEN     10
+    #endif
+    
+    #define uC_SPI3_TYPE            SPI_HWIF_USCI_B
+    #define uC_SPI3_BASE            USCI_B1_BASE
+    #define uC_SPI3_VECTOR          USCI_B1_VECTOR
+
+    #define uC_PORTSEL_SPI3_MISO    GPIO_PORT_P4
+    #define uC_PINSEL_SPI3_MISO     GPIO_PIN2
+    
+    #define uC_PORTSEL_SPI3_MOSI    GPIO_PORT_P4
+    #define uC_PINSEL_SPI3_MOSI     GPIO_PIN1
+    
+    #define uC_PORTSEL_SPI3_SCLK    GPIO_PORT_P4
+    #define uC_PINSEL_SPI3_SCLK     GPIO_PIN3
+    /**@}*/ 
+    
+/**@}*/ 
+
+
+/**
  * @name Timer Configuration
  */
 /**@{*/ 

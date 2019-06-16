@@ -43,6 +43,28 @@
 /**@}*/ 
 
 /**
+ * @name SPI Configuration
+ */
+/**@{*/
+    #if (uC_SPI0_ENABLED + uC_SPI1_ENABLED + uC_SPI2_ENABLED + uC_SPI3_ENABLED) > 0
+        #define uC_INCLUDE_SPI_IFACE
+    #endif
+    #if (uC_SPI0_ENABLED + uC_SPI2_ENABLED) > 0
+        #define uC_INCLUDE_SPI_A_IFACE
+    #endif
+    #if (uC_SPI1_ENABLED + uC_SPI3_ENABLED) > 0
+        #define uC_INCLUDE_SPI_B_IFACE
+    #endif
+    
+    #ifndef APP_SUPPORT_SPI_SELECT_PIO
+        #define APP_SUPPORT_SPI_SELECT_PIO      1
+    #endif
+    #ifndef APP_SUPPORT_SPI_SELECT_FUNC
+        #define APP_SUPPORT_SPI_SELECT_FUNC     1
+    #endif
+/**@}*/ 
+
+/**
  * @name TIMER Configuration
  */
 /**@{*/
