@@ -28,7 +28,6 @@
 #ifdef uC_INCLUDE_TIMER_IFACE
 
 typedef enum {
-    TIMER_HWIF_UNDEF, 
     TIMER_HWIF_TIMER_A, 
     TIMER_HWIF_TIMER_B
 } TIMER_HWIF_TYPE;
@@ -114,16 +113,13 @@ extern const timer_if_t *const timer_if[];
 
 
 static inline void timer_init(uint8_t intfnum){
-    if (timer_if[intfnum]->hwif->type == TIMER_HWIF_UNDEF){
-        ;
-    }
     #ifdef uC_INCLUDE_TIMER_A_IFACE
-    else if (timer_if[intfnum]->hwif->type == TIMER_HWIF_TIMER_A){
+    if (timer_if[intfnum]->hwif->type == TIMER_HWIF_TIMER_A){
         timer_A_init(intfnum);
     }
     #endif
     #ifdef uC_INCLUDE_TIMER_B_IFACE
-    else if(timer_if[intfnum]->hwif->type == TIMER_HWIF_TIMER_B){
+    if (timer_if[intfnum]->hwif->type == TIMER_HWIF_TIMER_B){
         timer_B_init(intfnum);
     }
     #endif
