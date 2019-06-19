@@ -21,6 +21,7 @@
 
 
 #include "hal/uc/spi.h"
+#include "hal/uc/gpio.h"
 
 #include <msp430-driverlib/MSP430F5xx_6xx/usci_a_spi.h>
 #include <msp430-driverlib/MSP430F5xx_6xx/usci_b_spi.h>
@@ -107,32 +108,28 @@ const spi_if_t *const spi_if[4] = {
     #endif
 };
 
-#ifdef uC_INCLUDE_SPI_A_IFACE
-    void spi_A_init(uint8_t intfnum){
-//         timer_set_mode(intfnum, TIMER_MODE_STOPPED);
-//         timer_set_prescaler(intfnum, TIMER_PRESCALER_DIV1);
-//         timer_disable_int_overflow(intfnum);
-//         timer_disable_int_top(intfnum);
-//         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) &= ~(TASSEL0 | TASSEL1);
-//         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= uC_TIMER_DEFAULT_CLKSOURCE;
-//         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= TACLR;
-        ;
-    }
-#endif
 
-#ifdef uC_INCLUDE_SPI_B_IFACE
-    void spi_B_init(uint8_t intfnum){
-//         timer_set_mode(intfnum, TIMER_MODE_STOPPED);
-//         timer_set_prescaler(intfnum, TIMER_PRESCALER_DIV1);
-//         timer_disable_int_overflow(intfnum);
-//         timer_disable_int_top(intfnum);
-//         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) &= ~(CNTL0 | CNTL1);
-//         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) &= ~(TASSEL0 | TASSEL1);
-//         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= uC_TIMER_DEFAULT_CLKSOURCE;
-//         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= TACLR;
-        ;
+static void _spi_reset(uint8_t intfnum){
+    switch(spi_if[intfnum]->hwif->type){
+        case SPI_HWIF_USCI_A:
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL1) |= UCSWRST;
+            break;
+        case SPI_HWIF_USCI_B:
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL1) |= UCSWRST;
+            break;
     }
-#endif
+}
+
+static void _spi_enable(uint8_t intfnum){
+    switch(spi_if[intfnum]->hwif->type){
+        case SPI_HWIF_USCI_A:
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL1) &= ~UCSWRST;
+            break;
+        case SPI_HWIF_USCI_B:
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL1) &= ~UCSWRST;
+            break;
+    }
+}
 
 static void _spi_gpio_init(uint8_t intfnum){
     switch (intfnum){
@@ -159,20 +156,109 @@ static void _spi_gpio_init(uint8_t intfnum){
     }
 }
 
+static void _spi_conf_sclk(uint8_t intfnum, spi_sclk_conf sclk){
+    uint16_t offset;
+    if (sclk & SPI_CLKSHAP_DEFINED){
+        
+        switch(spi_if[intfnum]->hwif->type){
+            case SPI_HWIF_USCI_A:
+                offset = OFS_UCAxCTL0;
+                break;
+            case SPI_HWIF_USCI_B:
+                offset = OFS_UCBxCTL0;
+                break;
+        }
+        
+        switch(sclk & SPI_CLKPHA_MASK){
+            case SPI_CLKPHA_CAP_CHG:
+                HWREG8(spi_if[intfnum]->hwif->base + offset) |= UCCKPH;
+                break;
+            case SPI_CLKPHA_CHG_CAP:
+                HWREG8(spi_if[intfnum]->hwif->base + offset) &= ~UCCKPH;
+                break;
+        }
+    
+        switch(sclk & SPI_CLKPOL_MASK){
+            case SPI_CLKPOL_AH:
+                HWREG8(spi_if[intfnum]->hwif->base + offset) &= ~UCCKPL;
+                break;
+            case SPI_CLKPOL_AL:
+                HWREG8(spi_if[intfnum]->hwif->base + offset) |= UCCKPL;
+                break;
+        }
+    }
+    
+    if (sclk & SPI_CLKFREQ_DEFINED){
+        switch(spi_if[intfnum]->hwif->type){
+            case SPI_HWIF_USCI_A:
+                HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxBR0) = (sclk & SPI_CLKFREQ_MASK) * 2;
+                break;
+            case SPI_HWIF_USCI_B:
+                HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxBR0) = (sclk & SPI_CLKFREQ_MASK) * 2;
+                break;
+        }
+    }
+        
+    spi_if[intfnum]->state->sclk = sclk;
+}
 
 static void _spi_init(uint8_t intfnum){
+    _spi_reset(intfnum);
     _spi_gpio_init(intfnum);
     fifoq_init(spi_if[intfnum]->queue);
-    #ifdef uC_INCLUDE_SPI_A_IFACE
-    if (spi_if[intfnum]->hwif->type == SPI_HWIF_USCI_A){
-        spi_A_init(intfnum);
+ 
+    uint8_t clk_default;
+    uint8_t clk_source;
+    switch(intfnum){
+        case 0:
+            clk_source = uC_SPI0_CLKSOURCE;
+            clk_default = SPI_CLKFREQ_DEFINED | ((APP_SPI0_SCLK_FREQ_DEFAULT * 2 / uC_SPI0_SCLK_BASE_FREQ)  & SPI_CLKFREQ_MASK);
+            break;
+        case 1:
+            clk_source = uC_SPI1_CLKSOURCE;
+            clk_default = SPI_CLKFREQ_DEFINED | ((APP_SPI1_SCLK_FREQ_DEFAULT * 2 / uC_SPI1_SCLK_BASE_FREQ) & SPI_CLKFREQ_MASK);
+            break;
+        case 2:
+            clk_source = uC_SPI2_CLKSOURCE;
+            clk_default = SPI_CLKFREQ_DEFINED | ((APP_SPI2_SCLK_FREQ_DEFAULT * 2 / uC_SPI2_SCLK_BASE_FREQ) & SPI_CLKFREQ_MASK);
+            break;
+        case 3:
+            clk_source = uC_SPI3_CLKSOURCE;
+            clk_default = SPI_CLKFREQ_DEFINED | ((APP_SPI3_SCLK_FREQ_DEFAULT * 2 / uC_SPI3_SCLK_BASE_FREQ) & SPI_CLKFREQ_MASK);
+            break;
     }
-    #endif
-    #ifdef uC_INCLUDE_SPI_B_IFACE
-    if (spi_if[intfnum]->hwif->type == SPI_HWIF_USCI_B){
-        spi_B_init(intfnum);
+    
+    switch(spi_if[intfnum]->hwif->type){
+        case SPI_HWIF_USCI_A:
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL0) = 0x00;
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL0) |= UCMST;
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL1) &= ~(UCSSEL0 | UCSSEL1);
+            switch(clk_source){
+                case CLKSOURCE_SMCLK:
+                    HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL1) |= UCSSEL__SMCLK;
+                    break;
+                case CLKSOURCE_ACLK:
+                    HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL1) |= UCSSEL__ACLK;
+                    break;
+            }
+            break;
+        case SPI_HWIF_USCI_B:
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxCTL0) = 0x00;
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxCTL0) |= UCMST;
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxCTL1) &= ~(UCSSEL0 | UCSSEL1);
+            switch(clk_source){
+                case CLKSOURCE_SMCLK:
+                    HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxCTL1) |= UCSSEL__SMCLK;
+                    break;
+                case CLKSOURCE_ACLK:
+                    HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxCTL1) |= UCSSEL__ACLK;
+                    break;
+            }
+            break;
     }
-    #endif
+    
+    _spi_conf_sclk(intfnum, (SPI_CLKSHAP_DEFINED | SPI_CLKPOL_AL | SPI_CLKPHA_CHG_CAP | clk_default));
+    _spi_enable(intfnum);
 }
 
 void spi_init(void){
@@ -204,8 +290,14 @@ void spi_init_slave(uint8_t intfnum, spi_slave_t * slave){
     }
 }
 
-
 void spi_select_slave(uint8_t intfnum, spi_slave_t * slave){
+    #if SPI_SUPPORT_SCLK_CTL 
+    if (spi_if[intfnum]->state->sclk != slave->sclk){
+        _spi_reset(intfnum);
+        _spi_conf_sclk(intfnum, slave->sclk);
+        _spi_enable(intfnum);
+    }
+    #endif
     switch(slave->sst){
         #if APP_SUPPORT_SPI_SELECT_PIO
         case SPI_SELECTOR_PIO:
@@ -244,15 +336,27 @@ static void _spi_trigger(uint8_t intfnum){
         if (spi_if[intfnum]->state->ctrans->slave){
             spi_select_slave(intfnum, spi_if[intfnum]->state->ctrans->slave);
         }
-        if (spi_if[intfnum]->hwif->type == SPI_HWIF_USCI_A){
-            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxIE) |= UCTXIE;
-        }
-        else if (spi_if[intfnum]->hwif->type == SPI_HWIF_USCI_B){
-            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxIE) |= UCTXIE;
+        switch(spi_if[intfnum]->hwif->type){
+            case SPI_HWIF_USCI_A:
+                HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxIE) |= UCTXIE;
+                break;
+            case SPI_HWIF_USCI_B:
+                HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxIE) |= UCTXIE;
+                break;
         }
     }
 }
 
+static void _spi_wait_busy(uint8_t intfnum){
+    switch(spi_if[intfnum]->hwif->type){
+        case SPI_HWIF_USCI_A:
+            while ( HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxSTAT) & UCBUSY );
+            break;
+        case SPI_HWIF_USCI_B:
+            while ( HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxSTAT) & UCBUSY );
+            break;
+    }
+}
 
 // The reactor is to run in the main thread. This ensures that there is no 
 // undue exposure to risks of long running callbacks and more inportantly, bypasses
@@ -264,6 +368,7 @@ static void _spi_reactor(uint8_t intfnum){
         spi_if[intfnum]->state->ctrans = NULL;
         spi_if[intfnum]->state->done = 0;
         if (transaction->slave){
+            _spi_wait_busy(intfnum);
             spi_deselect_slave(intfnum, transaction->slave);
         }
     }

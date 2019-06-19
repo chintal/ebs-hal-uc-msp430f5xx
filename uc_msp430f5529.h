@@ -102,6 +102,16 @@
         #define uC_UART0_RXBUF_LEN     10
     #endif
     
+    #ifndef uC_UART0_CLKSOURCE
+        #define uC_UART0_CLKSOURCE     CLKSOURCE_SMCLK
+    #endif
+    
+    #if (uC_UART0_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_UART0_BASECLK_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_UART0_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_UART0_BASECLK_FREQ  uC_ACLK_FRQ_HZ
+    #endif
+    
     #define uC_UART0_TYPE          UART_HWIF_USCI_A
     #define uC_UART0_BASE          USCI_A0_BASE
     #define uC_UART0_VECTOR        USCI_A0_VECTOR
@@ -125,6 +135,16 @@
     #endif
     #ifndef uC_UART1_RXBUF_LEN
         #define uC_UART1_RXBUF_LEN     10
+    #endif
+    
+    #ifndef uC_UART1_CLKSOURCE
+        #define uC_UART1_CLKSOURCE     CLKSOURCE_SMCLK
+    #endif
+    
+    #if (uC_UART1_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_UART1_BASECLK_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_UART1_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_UART1_BASECLK_FREQ  uC_ACLK_FRQ_HZ
     #endif
     
     #define uC_UART1_TYPE          UART_HWIF_USCI_A
@@ -158,6 +178,20 @@
     #ifndef uC_SPI0_RXBUF_LEN
         #define uC_SPI0_RXBUF_LEN     10
     #endif
+
+    #ifndef uC_SPI0_CLKSOURCE
+        #define uC_SPI0_CLKSOURCE       CLKSOURCE_SMCLK
+    #endif
+    
+    #if (uC_SPI0_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_SPI0_SCLK_BASE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_SPI0_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_SPI0_SCLK_BASE_FREQ  uC_ACLK_FRQ_HZ
+    #endif
+    
+    #ifndef APP_SPI0_SCLK_FREQ_DEFAULT
+        #define APP_SPI0_SCLK_FREQ_DEFAULT  4000000UL
+    #endif
     
     #define uC_SPI0_TYPE            SPI_HWIF_USCI_A
     #define uC_SPI0_BASE            USCI_A0_BASE
@@ -183,6 +217,20 @@
     #endif
     #ifndef uC_SPI1_RXBUF_LEN
         #define uC_SPI1_RXBUF_LEN     10
+    #endif
+    
+    #ifndef uC_SPI1_CLKSOURCE
+        #define uC_SPI1_CLKSOURCE       CLKSOURCE_SMCLK
+    #endif
+    
+    #if (uC_SPI1_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_SPI1_SCLK_BASE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_SPI1_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_SPI1_SCLK_BASE_FREQ  uC_ACLK_FRQ_HZ
+    #endif
+    
+    #ifndef APP_SPI1_SCLK_FREQ_DEFAULT
+        #define APP_SPI1_SCLK_FREQ_DEFAULT  4000000UL
     #endif
     
     #define uC_SPI1_TYPE            SPI_HWIF_USCI_B
@@ -211,6 +259,20 @@
         #define uC_SPI2_RXBUF_LEN     10
     #endif
     
+    #ifndef uC_SPI2_CLKSOURCE
+        #define uC_SPI2_CLKSOURCE       CLKSOURCE_SMCLK
+    #endif
+    
+    #if (uC_SPI2_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_SPI2_SCLK_BASE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_SPI2_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_SPI2_SCLK_BASE_FREQ  uC_ACLK_FRQ_HZ
+    #endif
+    
+    #ifndef APP_SPI2_SCLK_FREQ_DEFAULT
+        #define APP_SPI2_SCLK_FREQ_DEFAULT  4000000UL
+    #endif
+    
     #define uC_SPI2_TYPE            SPI_HWIF_USCI_A
     #define uC_SPI2_BASE            USCI_A1_BASE
     #define uC_SPI2_VECTOR          USCI_A1_VECTOR
@@ -237,6 +299,20 @@
         #define uC_SPI3_RXBUF_LEN     10
     #endif
     
+    #ifndef uC_SPI3_CLKSOURCE
+        #define uC_SPI3_CLKSOURCE       CLKSOURCE_SMCLK
+    #endif
+    
+    #if (uC_SPI3_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_SPI3_SCLK_BASE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_SPI3_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_SPI3_SCLK_BASE_FREQ  uC_ACLK_FRQ_HZ
+    #endif
+    
+    #ifndef APP_SPI3_SCLK_FREQ_DEFAULT
+        #define APP_SPI3_SCLK_FREQ_DEFAULT  4000000UL
+    #endif
+    
     #define uC_SPI3_TYPE            SPI_HWIF_USCI_B
     #define uC_SPI3_BASE            USCI_B1_BASE
     #define uC_SPI3_VECTOR          USCI_B1_VECTOR
@@ -260,9 +336,17 @@
 /**@{*/ 
 
     #define uC_AVAILABLE_TIMERS               4
-    #define uC_TIMER_DEFAULT_CLKSOURCE        TASSEL__SMCLK
-    #define uC_TIMER_DEFAULT_CLKSOURCE_FREQ   uC_SMCLK_FRQ_HZ
 
+    #ifndef uC_TIMER_DEFAULT_CLKSOURCE
+        #define uC_TIMER_DEFAULT_CLKSOURCE    CLKSOURCE_SMCLK
+    #endif
+    
+    #if (uC_TIMER_DEFAULT_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_TIMER_DEFAULT_CLKSOURCE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_TIMER_DEFAULT_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_TIMER_DEFAULT_CLKSOURCE_FREQ  uC_ACLK_FRQ_HZ
+    #endif
+    
     /**
     * @name TIMER 0 Configuration
     */
@@ -309,6 +393,12 @@
     #define uC_HAS_TIMER3              1
     #ifndef uC_TIMER3_CLKSOURCE
         #define uC_TIMER3_CLKSOURCE    CLKSOURCE_SMCLK
+    #endif
+    
+    #if (uC_TIMER3_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_TIMER3_CLKSOURCE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_TIMER3_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_TIMER3_CLKSOURCE_FREQ  uC_ACLK_FRQ_HZ
     #endif
     
     #define uC_TIMER3_TYPE             TIMER_HWIF_TIMER_B

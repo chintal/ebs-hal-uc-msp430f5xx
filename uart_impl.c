@@ -27,10 +27,14 @@
 
 #if uC_UART0_ENABLED
 
-    // BAUD RATE GENERATION
-    #define _UART0_DIV_INT              (uC_SMCLK_FRQ_HZ / uC_UART0_BAUD)
+    #if uC_UART0_CLKSOURCE == CLKSOURCE_SMCLK
+        #define _UART0_CLKSEL           USCI_A_UART_CLOCKSOURCE_SMCLK
+    #endif
     
-    #define _UART0_DIV_FRAC_NUMERATOR   (uC_SMCLK_FRQ_HZ - (_UART0_DIV_INT * uC_UART0_BAUD))
+    // BAUD RATE GENERATION
+    #define _UART0_DIV_INT              (uC_UART0_BASECLK_FREQ / uC_UART0_BAUD)
+    
+    #define _UART0_DIV_FRAC_NUMERATOR   (uC_UART0_BASECLK_FREQ - (_UART0_DIV_INT * uC_UART0_BAUD))
     #define _UART0_DIV_FRAC_NUM_X_8     (_UART0_DIV_FRAC_NUMERATOR * 8)
     #define _UART0_DIV_FRAC_X_8         (_UART0_DIV_FRAC_NUM_X_8 / uC_UART0_BAUD)
 
@@ -79,7 +83,7 @@
     #if uC_UART0_TYPE == UART_HWIF_USCI_A
     static inline void _uart0_peripheral_init(void){
         USCI_A_UART_initParam param = {0};
-        param.selectClockSource =   USCI_A_UART_CLOCKSOURCE_SMCLK;
+        param.selectClockSource =   _UART0_CLKSEL;
         param.clockPrescalar =      _UART0_DIV_INT;
         param.firstModReg =         0;
         param.secondModReg =        (uint8_t)_UART0_BRS_VAL;
@@ -105,10 +109,14 @@
     
 #if uC_UART1_ENABLED
 
+    #if uC_UART1_CLKSOURCE == CLKSOURCE_SMCLK
+        #define _UART1_CLKSEL           USCI_A_UART_CLOCKSOURCE_SMCLK
+    #endif
+
     // BAUD RATE GENERATION
-    #define _UART1_DIV_INT              (uC_SMCLK_FRQ_HZ / uC_UART1_BAUD)
+    #define _UART1_DIV_INT              (uC_UART1_BASECLK_FREQ / uC_UART1_BAUD)
     
-    #define _UART1_DIV_FRAC_NUMERATOR   (uC_SMCLK_FRQ_HZ - (_UART1_DIV_INT * uC_UART1_BAUD))
+    #define _UART1_DIV_FRAC_NUMERATOR   (uC_UART1_BASECLK_FREQ - (_UART1_DIV_INT * uC_UART1_BAUD))
     #define _UART1_DIV_FRAC_NUM_X_8     (_UART1_DIV_FRAC_NUMERATOR * 8)
     #define _UART1_DIV_FRAC_X_8         (_UART1_DIV_FRAC_NUM_X_8 / uC_UART1_BAUD)
 
@@ -156,7 +164,7 @@
     #if uC_UART1_TYPE == UART_HWIF_USCI_A
     static inline void _uart1_peripheral_init(void){
         USCI_A_UART_initParam param = {0};
-        param.selectClockSource =   USCI_A_UART_CLOCKSOURCE_SMCLK;
+        param.selectClockSource =   _UART1_CLKSEL;
         param.clockPrescalar =      _UART1_DIV_INT;
         param.firstModReg =         0;
         param.secondModReg =        (uint8_t)_UART1_BRS_VAL;

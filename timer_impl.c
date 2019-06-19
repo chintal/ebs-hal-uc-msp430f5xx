@@ -112,13 +112,19 @@ const timer_if_t *const timer_if[4] = {
 
 
 #ifdef uC_INCLUDE_TIMER_A_IFACE
+    #if uC_TIMER_DEFAULT_CLKSOURCE == CLKSOURCE_ACLK
+        #define _TIMER_DEFAULT_CLKSEL   TASSEL__ACLK
+    #elif uC_TIMER_DEFAULT_CLKSOURCE == CLKSOURCE_SMCLK
+        #define _TIMER_DEFAULT_CLKSEL   TASSEL__SMCLK
+    #endif
+    
     void timer_A_init(uint8_t intfnum){
         timer_set_mode(intfnum, TIMER_MODE_STOPPED);
         timer_set_prescaler(intfnum, TIMER_PRESCALER_DIV1);
         timer_disable_int_overflow(intfnum);
         timer_disable_int_top(intfnum);
         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) &= ~(TASSEL0 | TASSEL1);
-        HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= uC_TIMER_DEFAULT_CLKSOURCE;
+        HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= _TIMER_DEFAULT_CLKSEL;
         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= TACLR;
     }
 #endif

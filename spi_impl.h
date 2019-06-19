@@ -24,7 +24,6 @@
 
 #include <stddef.h>
 #include "hal/uc/spi.h"
-#include "hal/uc/gpio.h"
 #include <msp430-driverlib/MSP430F5xx_6xx/driverlib.h>
 #include <ds/fifoq.h>
 
@@ -45,6 +44,9 @@ typedef struct _SPI_STATE_t{
     volatile uint8_t done;
     spi_transaction_t * ctrans;
     spi_slave_t * slave;
+    #if SPI_SUPPORT_SCLK_CTL
+    spi_sclk_conf sclk;
+    #endif
 }spi_state_t;
 
 typedef struct SPI_IF_t{
@@ -70,14 +72,6 @@ extern const spi_if_t *const spi_if[];
 #if uC_SPI3_ENABLED
     extern const spi_if_t spi3_if;
     extern spi_transaction_t * spi3_ctrans;
-#endif
-
-#ifdef uC_INCLUDE_SPI_A_IFACE
-    void spi_A_init(uint8_t intfnum);
-#endif
-    
-#ifdef uC_INCLUDE_SPI_B_IFACE
-    void spi_B_init(uint8_t intfnum);
 #endif
     
 static inline void spi_enqueue_transaction(uint8_t intfnum, spi_transaction_t * transaction){
