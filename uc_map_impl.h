@@ -63,11 +63,8 @@
         #define APP_SUPPORT_SPI_SELECT_FUNC     1
     #endif
     
-    #ifndef APP_SUPPORT_SPI_CTL_CLKSHAPE
-        #define APP_SUPPORT_SPI_CTL_CLKSHAPE    1
-    #endif
-    #ifndef APP_SUPPORT_SPI_CTL_CLKFREQ
-        #define APP_SUPPORT_SPI_CTL_CLKFREQ     1
+    #ifndef APP_SUPPORT_SPI_CTL
+        #define APP_SUPPORT_SPI_CTL             1
     #endif
 /**@}*/ 
 

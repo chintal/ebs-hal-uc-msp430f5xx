@@ -109,7 +109,7 @@ const spi_if_t *const spi_if[4] = {
 };
 
 
-static void _spi_reset(uint8_t intfnum){
+static inline void _spi_reset(uint8_t intfnum){
     switch(spi_if[intfnum]->hwif->type){
         case SPI_HWIF_USCI_A:
             HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL1) |= UCSWRST;
@@ -120,7 +120,7 @@ static void _spi_reset(uint8_t intfnum){
     }
 }
 
-static void _spi_enable(uint8_t intfnum){
+static inline void _spi_enable(uint8_t intfnum){
     switch(spi_if[intfnum]->hwif->type){
         case SPI_HWIF_USCI_A:
             HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxCTL1) &= ~UCSWRST;
@@ -158,48 +158,60 @@ static void _spi_gpio_init(uint8_t intfnum){
 
 static void _spi_conf_sclk(uint8_t intfnum, spi_sclk_conf sclk){
     uint16_t offset;
-    if (sclk & SPI_CLKSHAP_DEFINED){
-        
-        switch(spi_if[intfnum]->hwif->type){
-            case SPI_HWIF_USCI_A:
-                offset = OFS_UCAxCTL0;
-                break;
-            case SPI_HWIF_USCI_B:
-                offset = OFS_UCBxCTL0;
-                break;
-        }
-        
-        switch(sclk & SPI_CLKPHA_MASK){
-            case SPI_CLKPHA_CAP_CHG:
-                HWREG8(spi_if[intfnum]->hwif->base + offset) |= UCCKPH;
-                break;
-            case SPI_CLKPHA_CHG_CAP:
-                HWREG8(spi_if[intfnum]->hwif->base + offset) &= ~UCCKPH;
-                break;
-        }
     
-        switch(sclk & SPI_CLKPOL_MASK){
-            case SPI_CLKPOL_AH:
-                HWREG8(spi_if[intfnum]->hwif->base + offset) &= ~UCCKPL;
-                break;
-            case SPI_CLKPOL_AL:
-                HWREG8(spi_if[intfnum]->hwif->base + offset) |= UCCKPL;
-                break;
-        }
+    switch(spi_if[intfnum]->hwif->type){
+        case SPI_HWIF_USCI_A:
+            offset = OFS_UCAxCTL0;
+            break;
+        case SPI_HWIF_USCI_B:
+            offset = OFS_UCBxCTL0;
+            break;
     }
     
-    if (sclk & SPI_CLKFREQ_DEFINED){
-        switch(spi_if[intfnum]->hwif->type){
-            case SPI_HWIF_USCI_A:
-                HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxBR0) = (sclk & SPI_CLKFREQ_MASK) * 2;
-                break;
-            case SPI_HWIF_USCI_B:
-                HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxBR0) = (sclk & SPI_CLKFREQ_MASK) * 2;
-                break;
-        }
+    switch(sclk.clkpha){
+        case SPI_CLKPHA_CAP_CHG:
+            HWREG8(spi_if[intfnum]->hwif->base + offset) |= UCCKPH;
+            break;
+        case SPI_CLKPHA_CHG_CAP:
+            HWREG8(spi_if[intfnum]->hwif->base + offset) &= ~UCCKPH;
+            break;
     }
-        
+
+    switch(sclk.clkpol){
+        case SPI_CLKPOL_AH:
+            HWREG8(spi_if[intfnum]->hwif->base + offset) &= ~UCCKPL;
+            break;
+        case SPI_CLKPOL_AL:
+            HWREG8(spi_if[intfnum]->hwif->base + offset) |= UCCKPL;
+            break;
+    }
+    
+    switch(sclk.endian){
+        case SPI_DATA_LSBFIRST:
+            HWREG8(spi_if[intfnum]->hwif->base + offset) &= ~UCMSB;
+        case SPI_DATA_MSBFIRST:
+            HWREG8(spi_if[intfnum]->hwif->base + offset) |= UCMSB;
+    }
+    
+    switch(sclk.width){
+        case SPI_DATA_8BIT:
+            HWREG8(spi_if[intfnum]->hwif->base + offset) &= ~UC7BIT;
+        case SPI_DATA_7BIT:
+            HWREG8(spi_if[intfnum]->hwif->base + offset) |= UC7BIT;
+    }
+    
+    switch(spi_if[intfnum]->hwif->type){
+        case SPI_HWIF_USCI_A:
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxBR0) = (sclk.clkdivider) * 2;
+            break;
+        case SPI_HWIF_USCI_B:
+            HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxBR0) = (sclk.clkdivider) * 2;
+            break;
+    }
+    
+    #if APP_SUPPORT_SPI_CTL
     spi_if[intfnum]->state->sclk = sclk;
+    #endif
 }
 
 static void _spi_init(uint8_t intfnum){
@@ -207,24 +219,31 @@ static void _spi_init(uint8_t intfnum){
     _spi_gpio_init(intfnum);
     fifoq_init(spi_if[intfnum]->queue);
  
-    uint8_t clk_default;
+    spi_sclk_conf defaults = {{
+        SPI_CLKPHA_CHG_CAP,
+        SPI_CLKPOL_AL,
+        SPI_DATA_LSBFIRST,
+        SPI_DATA_8BIT,
+        0,
+    }};
+    
     uint8_t clk_source;
     switch(intfnum){
         case 0:
+            defaults.clkdivider = uC_SPI0_SCLK_BASE_FREQ / (APP_SPI0_SCLK_FREQ_DEFAULT * 2);
             clk_source = uC_SPI0_CLKSOURCE;
-            clk_default = SPI_CLKFREQ_DEFINED | ((APP_SPI0_SCLK_FREQ_DEFAULT * 2 / uC_SPI0_SCLK_BASE_FREQ)  & SPI_CLKFREQ_MASK);
             break;
         case 1:
+            defaults.clkdivider = uC_SPI1_SCLK_BASE_FREQ / (APP_SPI1_SCLK_FREQ_DEFAULT * 2);
             clk_source = uC_SPI1_CLKSOURCE;
-            clk_default = SPI_CLKFREQ_DEFINED | ((APP_SPI1_SCLK_FREQ_DEFAULT * 2 / uC_SPI1_SCLK_BASE_FREQ) & SPI_CLKFREQ_MASK);
             break;
         case 2:
+            defaults.clkdivider = uC_SPI2_SCLK_BASE_FREQ / (APP_SPI2_SCLK_FREQ_DEFAULT * 2);
             clk_source = uC_SPI2_CLKSOURCE;
-            clk_default = SPI_CLKFREQ_DEFINED | ((APP_SPI2_SCLK_FREQ_DEFAULT * 2 / uC_SPI2_SCLK_BASE_FREQ) & SPI_CLKFREQ_MASK);
             break;
         case 3:
+            defaults.clkdivider = uC_SPI3_SCLK_BASE_FREQ / (APP_SPI3_SCLK_FREQ_DEFAULT * 2);
             clk_source = uC_SPI3_CLKSOURCE;
-            clk_default = SPI_CLKFREQ_DEFINED | ((APP_SPI3_SCLK_FREQ_DEFAULT * 2 / uC_SPI3_SCLK_BASE_FREQ) & SPI_CLKFREQ_MASK);
             break;
     }
     
@@ -257,7 +276,7 @@ static void _spi_init(uint8_t intfnum){
             break;
     }
     
-    _spi_conf_sclk(intfnum, (SPI_CLKSHAP_DEFINED | SPI_CLKPOL_AL | SPI_CLKPHA_CHG_CAP | clk_default));
+    _spi_conf_sclk(intfnum, defaults);
     _spi_enable(intfnum);
 }
 
@@ -276,7 +295,7 @@ void spi_init(void){
     #endif
 }
 
-void spi_init_slave(uint8_t intfnum, spi_slave_t * slave){
+void spi_init_slave(uint8_t intfnum, const spi_slave_t * slave){
     switch(slave->sst){
         #if APP_SUPPORT_SPI_SELECT_PIO
         case SPI_SELECTOR_PIO:
@@ -290,9 +309,9 @@ void spi_init_slave(uint8_t intfnum, spi_slave_t * slave){
     }
 }
 
-void spi_select_slave(uint8_t intfnum, spi_slave_t * slave){
-    #if SPI_SUPPORT_SCLK_CTL 
-    if (spi_if[intfnum]->state->sclk != slave->sclk){
+void spi_select_slave(uint8_t intfnum, const spi_slave_t * slave){
+    #if APP_SUPPORT_SPI_CTL
+    if (spi_if[intfnum]->state->sclk.asint != slave->sclk.asint){
         _spi_reset(intfnum);
         _spi_conf_sclk(intfnum, slave->sclk);
         _spi_enable(intfnum);
@@ -313,7 +332,7 @@ void spi_select_slave(uint8_t intfnum, spi_slave_t * slave){
     spi_if[intfnum]->state->slave = slave;
 }
 
-void spi_deselect_slave(uint8_t intfnum, spi_slave_t * slave){
+void spi_deselect_slave(uint8_t intfnum, const spi_slave_t * slave){
     switch(slave->sst){
         #if APP_SUPPORT_SPI_SELECT_PIO
         case SPI_SELECTOR_PIO:

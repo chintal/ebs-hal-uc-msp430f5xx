@@ -43,8 +43,8 @@ typedef struct _SPI_HWIF_t{
 typedef struct _SPI_STATE_t{
     volatile uint8_t done;
     spi_transaction_t * ctrans;
-    spi_slave_t * slave;
-    #if SPI_SUPPORT_SCLK_CTL
+    const spi_slave_t * slave;
+    #if APP_SUPPORT_SPI_CTL
     spi_sclk_conf sclk;
     #endif
 }spi_state_t;
