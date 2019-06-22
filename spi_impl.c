@@ -33,11 +33,14 @@
         
     spi_state_t spi0_state = {0, NULL, NULL};
     fifoq_t spi0_queue;
-        
+    uint8_t _spi0_simpletx_buf[10];
+    bytebuf spi0_simpletx_buffer;
+    
     const spi_if_t spi0_if = {
         &_spi0_hwif,
         &spi0_state,
-        &spi0_queue
+        &spi0_queue,
+        &spi0_simpletx_buffer,
     };  
 #endif
     
@@ -46,11 +49,14 @@
         
     spi_state_t spi1_state = {0, NULL, NULL};
     fifoq_t spi1_queue;
+    uint8_t _spi1_simpletx_buf[10];
+    bytebuf spi1_simpletx_buffer;
         
     const spi_if_t spi1_if = {
         &_spi1_hwif,
         &spi1_state,
-        &spi1_queue
+        &spi1_queue,
+        &spi1_simpletx_buffer,
     };  
 #endif
     
@@ -59,11 +65,14 @@
         
     spi_state_t spi2_state = {0, NULL, NULL};
     fifoq_t spi2_queue;
+    uint8_t _spi2_simpletx_buf[10];
+    bytebuf spi2_simpletx_buffer;
         
     const spi_if_t spi2_if = {
         &_spi2_hwif,
         &spi2_state,
-        &spi2_queue
+        &spi2_queue,
+        &spi2_simpletx_buffer,
     };  
 #endif
 
@@ -72,14 +81,16 @@
         
     spi_state_t spi3_state = {0, NULL, NULL};
     fifoq_t spi3_queue;
+    uint8_t _spi3_simpletx_buf[10];
+    bytebuf spi3_simpletx_buffer;
         
     const spi_if_t spi3_if = {
         &_spi3_hwif,
         &spi3_state,
         &spi3_queue
+        &spi3_simpletx_buffer,
     };  
 #endif
-
 
 
 const spi_if_t *const spi_if[4] = {
@@ -229,22 +240,34 @@ static void _spi_init(uint8_t intfnum){
     
     uint8_t clk_source;
     switch(intfnum){
+        #if uC_SPI0_ENABLED
         case 0:
+            bytebuf_vInit((uint8_t * )(&_spi0_simpletx_buf), 10, &spi0_simpletx_buffer);
             defaults.clkdivider = uC_SPI0_SCLK_BASE_FREQ / (APP_SPI0_SCLK_FREQ_DEFAULT * 2);
             clk_source = uC_SPI0_CLKSOURCE;
             break;
+        #endif
+        #if uC_SPI1_ENABLED
         case 1:
+            bytebuf_vInit((uint8_t * )(&_spi1_simpletx_buf), 10, &spi1_simpletx_buffer);
             defaults.clkdivider = uC_SPI1_SCLK_BASE_FREQ / (APP_SPI1_SCLK_FREQ_DEFAULT * 2);
             clk_source = uC_SPI1_CLKSOURCE;
             break;
+        #endif
+        #if uC_SPI2_ENABLED
         case 2:
+            bytebuf_vInit((uint8_t * )(&_spi2_simpletx_buf), 10, &spi2_simpletx_buffer);
             defaults.clkdivider = uC_SPI2_SCLK_BASE_FREQ / (APP_SPI2_SCLK_FREQ_DEFAULT * 2);
             clk_source = uC_SPI2_CLKSOURCE;
             break;
+        #endif
+        #if uC_SPI3_ENABLED
         case 3:
+            bytebuf_vInit((uint8_t * )(&_spi3_simpletx_buf), 10, &spi3_simpletx_buffer);
             defaults.clkdivider = uC_SPI3_SCLK_BASE_FREQ / (APP_SPI3_SCLK_FREQ_DEFAULT * 2);
             clk_source = uC_SPI3_CLKSOURCE;
             break;
+        #endif
     }
     
     switch(spi_if[intfnum]->hwif->type){

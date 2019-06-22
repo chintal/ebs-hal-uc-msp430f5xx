@@ -26,6 +26,7 @@
 #include "hal/uc/spi.h"
 #include <msp430-driverlib/MSP430F5xx_6xx/driverlib.h>
 #include <ds/fifoq.h>
+#include <ds/bytebuf.h>
 
 #ifdef uC_INCLUDE_SPI_IFACE
 
@@ -53,6 +54,7 @@ typedef struct SPI_IF_t{
     const _spi_hwif_t *const hwif;
     spi_state_t *const state;
     fifoq_t *const queue;
+    bytebuf *const simpletx_buffer;
 }spi_if_t;
 
 extern const spi_if_t *const spi_if[];

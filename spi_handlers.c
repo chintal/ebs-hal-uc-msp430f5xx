@@ -56,13 +56,19 @@ static inline void spi_handler_tx(uint8_t intfnum){
     spi_transaction_t * ctrans = spi_if[intfnum]->state->ctrans;
     if (spi_if[intfnum]->hwif->type == SPI_HWIF_USCI_A){
         if (ctrans->txlen){
-                HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxTXBUF) = *(ctrans->txdata);
-                ctrans->txdata ++;
-                ctrans->txlen -= 1;
+            switch (ctrans->txtype){
+                case SPI_TRANSACTION_TXTYPE_PTR:
+                    HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxTXBUF) = *(ctrans->txdata);
+                    ctrans->txdata ++;
+                    break;
+                case SPI_TRANSACTION_TXTYPE_SHARED:
+                    break;
+            }
+            ctrans->txlen -= 1;
         }
         else{
             HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxIE) &= ~UCTXIE;
-            if (ctrans->rxlen){
+            if (ctrans->hasrx && ctrans->rxlen){
                 HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxRXBUF);
                 HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxIE) |= UCRXIE;
                 HWREG8(spi_if[intfnum]->hwif->base + OFS_UCAxTXBUF) = 0xFF;
@@ -74,13 +80,20 @@ static inline void spi_handler_tx(uint8_t intfnum){
     }
     else if (spi_if[intfnum]->hwif->type == SPI_HWIF_USCI_B){
         if (ctrans->txlen){
-                HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxTXBUF) = *(ctrans->txdata);
-                ctrans->txdata ++;
-                ctrans->txlen --;
+            switch (ctrans->txtype){
+                case SPI_TRANSACTION_TXTYPE_PTR:
+                    HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxTXBUF) = *(ctrans->txdata);
+                    ctrans->txdata ++;
+                    break;
+                case SPI_TRANSACTION_TXTYPE_SHARED:
+                    HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxTXBUF) = bytebuf_cPopByte(spi_if[intfnum]->simpletx_buffer);
+                    break;
+            }
+            ctrans->txlen -= 1;
         }
         else{
             HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxIE) &= ~UCTXIE;
-            if (ctrans->rxlen){
+            if (ctrans->hasrx && ctrans->rxlen){
                 HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxRXBUF);
                 HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxIE) |= UCRXIE;
                 HWREG8(spi_if[intfnum]->hwif->base + OFS_UCBxTXBUF) = 0xFF;
