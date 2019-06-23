@@ -26,11 +26,40 @@
 
 volatile uint8_t __timer_handler_inclusion;
 
+#if uC_TIMER0_ENABLED
+#ifdef uC_TIMER0_TOP_IRQ_HANDLER
+__attribute__((interrupt(uC_TIMER0_PRIMARY_VECTOR)))
+void _timer0_primary_irqhandler(void){
+    uC_TIMER0_TOP_IRQ_HANDLER();
+}
+#endif
+#endif
+
 #if uC_TIMER1_ENABLED
+#ifdef uC_TIMER1_TOP_IRQ_HANDLER
 __attribute__((interrupt(uC_TIMER1_PRIMARY_VECTOR)))
 void _timer1_primary_irqhandler(void){
     uC_TIMER1_TOP_IRQ_HANDLER();
 }
+#endif
+#endif
+
+#if uC_TIMER2_ENABLED
+#ifdef uC_TIMER2_TOP_IRQ_HANDLER
+__attribute__((interrupt(uC_TIMER2_PRIMARY_VECTOR)))
+void _timer2_primary_irqhandler(void){
+    uC_TIMER2_TOP_IRQ_HANDLER();
+}
+#endif
+#endif
+
+#if uC_TIMER3_ENABLED
+#ifdef uC_TIMER3_TOP_IRQ_HANDLER
+__attribute__((interrupt(uC_TIMER3_PRIMARY_VECTOR)))
+void _timer3_primary_irqhandler(void){
+    uC_TIMER3_TOP_IRQ_HANDLER();
+}
+#endif
 #endif
 
 

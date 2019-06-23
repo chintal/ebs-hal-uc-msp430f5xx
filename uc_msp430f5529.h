@@ -358,6 +358,15 @@
     #define uC_TIMER0_PRIMARY_VECTOR   TIMER0_A0_VECTOR
     #define uC_TIMER0_SECONDARY_VECTOR TIMER0_A1_VECTOR
     #define uC_TIMER0_CHANNELS         5
+    
+    #ifndef uC_TIMER0_CLKSOURCE
+        #define uC_TIMER0_CLKSOURCE         uC_TIMER_DEFAULT_CLKSOURCE
+    #endif
+    #if (uC_TIMER0_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_TIMER0_CLKSOURCE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_TIMER0_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_TIMER0_CLKSOURCE_FREQ  uC_ACLK_FRQ_HZ
+    #endif
     /**@}*/
     
     /**
@@ -371,6 +380,15 @@
     #define uC_TIMER1_PRIMARY_VECTOR   TIMER1_A0_VECTOR
     #define uC_TIMER1_SECONDARY_VECTOR TIMER1_A1_VECTOR
     #define uC_TIMER1_CHANNELS         3
+    
+    #ifndef uC_TIMER1_CLKSOURCE
+        #define uC_TIMER1_CLKSOURCE         uC_TIMER_DEFAULT_CLKSOURCE
+    #endif
+    #if (uC_TIMER1_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_TIMER1_CLKSOURCE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_TIMER1_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_TIMER1_CLKSOURCE_FREQ  uC_ACLK_FRQ_HZ
+    #endif
     /**@}*/ 
     
     /**
@@ -384,6 +402,15 @@
     #define uC_TIMER2_PRIMARY_VECTOR   TIMER2_A0_VECTOR
     #define uC_TIMER2_SECONDARY_VECTOR TIMER2_A1_VECTOR
     #define uC_TIMER2_CHANNELS         3
+    
+    #ifndef uC_TIMER2_CLKSOURCE
+        #define uC_TIMER2_CLKSOURCE         uC_TIMER_DEFAULT_CLKSOURCE
+    #endif
+    #if (uC_TIMER2_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_TIMER2_CLKSOURCE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_TIMER2_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_TIMER2_CLKSOURCE_FREQ  uC_ACLK_FRQ_HZ
+    #endif
     /**@}*/ 
     
     /**
@@ -391,21 +418,21 @@
     */
     /**@{*/ 
     #define uC_HAS_TIMER3              1
-    #ifndef uC_TIMER3_CLKSOURCE
-        #define uC_TIMER3_CLKSOURCE    CLKSOURCE_SMCLK
-    #endif
-    
-    #if (uC_TIMER3_CLKSOURCE == CLKSOURCE_SMCLK)
-        #define uC_TIMER3_CLKSOURCE_FREQ  uC_SMCLK_FRQ_HZ
-    #elif (uC_TIMER3_CLKSOURCE == CLKSOURCE_ACLK)
-        #define uC_TIMER3_CLKSOURCE_FREQ  uC_ACLK_FRQ_HZ
-    #endif
     
     #define uC_TIMER3_TYPE             TIMER_HWIF_TIMER_B
     #define uC_TIMER3_BASE             TIMER_B0_BASE
     #define uC_TIMER3_PRIMARY_VECTOR   TIMER0_B0_VECTOR
     #define uC_TIMER3_SECONDARY_VECTOR TIMER0_B1_VECTOR
     #define uC_TIMER3_CHANNELS         7
+    
+    #ifndef uC_TIMER3_CLKSOURCE
+        #define uC_TIMER3_CLKSOURCE    CLKSOURCE_SMCLK
+    #endif
+    #if (uC_TIMER3_CLKSOURCE == CLKSOURCE_SMCLK)
+        #define uC_TIMER3_CLKSOURCE_FREQ  uC_SMCLK_FRQ_HZ
+    #elif (uC_TIMER3_CLKSOURCE == CLKSOURCE_ACLK)
+        #define uC_TIMER3_CLKSOURCE_FREQ  uC_ACLK_FRQ_HZ
+    #endif
     /**@}*/ 
         
 /**@}*/ 

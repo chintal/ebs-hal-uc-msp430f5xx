@@ -106,7 +106,7 @@ extern const timer_if_t *const timer_if[];
     #ifdef uC_INCLUDE_TIMER_A_IFACE
     void timer_A_init(uint8_t intfnum);
     #endif
-    
+
     #ifdef uC_INCLUDE_TIMER_B_IFACE
     void timer_B_init(uint8_t intfnum);
     #endif
@@ -217,7 +217,7 @@ static inline void timer_set_prescaler(uint8_t intfnum, uint8_t prescaler){
     HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= TACLR;
     return;
 }
-
+    
 static inline void timer_set_mode(uint8_t intfnum, uint8_t mode){
     uint16_t lmode;
     timer_if[intfnum]->state->mode = mode;
@@ -276,6 +276,7 @@ static inline void timer_disable_int_top(uint8_t intfnum){
     timer_disable_int_ch(intfnum, 0);
 };
 
+// static
 static inline uint16_t timer_chctl_offset(uint8_t channel);
 
 static inline uint16_t timer_chctl_offset(uint8_t channel){
@@ -299,6 +300,9 @@ static inline void timer_set_outmode_ch(uint8_t intfnum, uint8_t channel, uint8_
         case TIMER_OUTMODE_NPWM:
             loutmode = OUTMOD_3;
             break;
+        case TIMER_OUTMODE_TOGGLE:
+            loutmode = OUTMOD_4;
+            break;
         default:
             loutmode = OUTMOD_0;
             break;
@@ -307,6 +311,7 @@ static inline void timer_set_outmode_ch(uint8_t intfnum, uint8_t channel, uint8_
     HWREG16(timer_if[intfnum]->hwif->base + timer_chctl_offset(channel)) |= (loutmode | OUT);
 }
 
+// static
 static inline uint16_t timer_chccr_offset(uint8_t channel);
 
 static inline uint16_t timer_chccr_offset(uint8_t channel){
