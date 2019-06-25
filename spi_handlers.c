@@ -22,6 +22,7 @@
 #include <ds/bytebuf.h>
 #include "hal/uc/spi.h"
 
+#ifdef uC_INCLUDE_SPI_IFACE
 
 volatile uint8_t __spi_handler_inclusion;
 
@@ -171,4 +172,6 @@ static inline void spi_handler_rx(uint8_t intfnum){
             spi_handler_rx(3);
         }
     }
+#endif
+
 #endif

@@ -21,8 +21,14 @@
 
 
 #include "hal/uc/entropy.h"
-#include "hal/uc/timer.h"
 #include "app/application.h"
+
+#ifndef APP_ENABLE_ENTROPY
+#define APP_ENABLE_ENTROPY  0
+#endif
+
+#if APP_ENABLE_ENTROPY
+#include "hal/uc/timer.h"
 #include <msp430-driverlib/MSP430F5xx_6xx/driverlib.h>
 #include <stdlib.h>
 
@@ -79,3 +85,5 @@ void entropy_deinit(void){
     UCSCTL4 = entropy_state->ucsctl4_bak;
     free(entropy_state);
 }
+
+#endif
